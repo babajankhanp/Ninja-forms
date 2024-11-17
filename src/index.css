@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base Colors */
+    --color-primary: 59 130 246;
+    --color-success: 34 197 94;
+    --color-warning: 234 179 8;
+    --color-error: 239 68 68;
+    
+    /* Light Mode */
+    --input-border: 226 232 240;
+    --input-border-hover: 148 163 184;
+    --input-border-focus: var(--color-primary);
+    --input-bg: 255 255 255;
+    --input-bg-hover: 248 250 252;
+    --input-text: 15 23 42;
+    --input-placeholder: 148 163 184;
+    --input-disabled: 241 245 249;
+  }
+
+  .dark {
+    /* Dark Mode */
+    --input-border: 51 65 85;
+    --input-border-hover: 71 85 105;
+    --input-border-focus: var(--color-primary);
+    --input-bg: 30 41 59;
+    --input-bg-hover: 51 65 85;
+    --input-text: 241 245 249;
+    --input-placeholder: 100 116 139;
+    --input-disabled: 51 65 85;
+  }
+
+  input, select, textarea {
+    @apply border-2 border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50;
+    @apply rounded-lg transition-all duration-200;
+    @apply dark:border-gray-600 dark:focus:border-blue-400 dark:bg-gray-700 dark:text-white;
+  }
+}
+
+@layer components {
+  .form-input {
+    @apply w-full px-4 py-2.5 rounded-lg transition-all duration-200;
+    @apply bg-[rgb(var(--input-bg))] border-2 border-[rgb(var(--input-border))];
+    @apply text-[rgb(var(--input-text))] placeholder-[rgb(var(--input-placeholder))];
+    @apply hover:border-[rgb(var(--input-border-hover))] hover:bg-[rgb(var(--input-bg-hover))];
+    @apply focus:ring-2 focus:ring-[rgb(var(--input-border-focus))] focus:border-[rgb(var(--input-border-focus))];
+    @apply disabled:bg-[rgb(var(--input-disabled))] disabled:cursor-not-allowed;
+  }
+
+  .form-input.error {
+    @apply border-[rgb(var(--color-error))] bg-red-50 dark:bg-red-900/20;
+    @apply focus:border-[rgb(var(--color-error))] focus:ring-[rgb(var(--color-error))];
+  }
+
+  .form-select {
+    @apply form-input pr-10 appearance-none bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-size: 1.25em 1.25em;
+  }
+
+  .rich-text-wrapper {
+    @apply bg-[rgb(var(--input-bg))] transition-all duration-200;
+  }
+
+  .rich-text-content {
+    @apply min-h-[150px] overflow-auto;
+  }
+
+  .rich-text-toolbar {
+    @apply flex gap-1 bg-[rgb(var(--input-bg-hover))];
+  }
+
+  .rich-text-button {
+    @apply p-1.5 rounded transition-colors duration-200;
+    @apply hover:bg-[rgb(var(--input-bg))] active:bg-[rgb(var(--input-border))];
+    @apply text-[rgb(var(--input-text))];
+  }
+
+  .date-input-wrapper {
+    @apply relative;
+  }
+
+  .date-format-select {
+    @apply absolute right-0 top-0 mt-2 mr-2 text-xs;
+    @apply text-[rgb(var(--input-placeholder))];
+  }
+
+  .multi-select-tag {
+    @apply inline-flex items-center gap-1 px-2 py-1 m-0.5 rounded-md text-sm;
+    @apply bg-[rgb(var(--color-primary))] text-white;
+  }
+
+  .multi-select-remove {
+    @apply hover:text-red-200 transition-colors duration-200;
+  }
+
+  .prose {
+    @apply max-w-none;
+  }
+
+  .prose p {
+    @apply mb-4;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic;
+  }
+
+  .prose code {
+    @apply bg-gray-100 rounded px-1 py-0.5 text-sm;
+  }
+
+  .prose pre {
+    @apply bg-gray-100 rounded p-4 overflow-x-auto;
+  }
+}
