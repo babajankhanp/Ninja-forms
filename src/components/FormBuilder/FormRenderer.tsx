@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Form, FormData, FormErrors } from '../../types/form';
 import { FieldGroupComponent } from './FieldGroupComponent';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -15,6 +16,8 @@ export const FormRenderer: React.FC<FormRendererProps> = ({ form }) => {
   const { formData, setFormData, clearPersistedData } = useFormPersistence(form.id);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+
+  const navigate = useNavigate();
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -64,10 +67,15 @@ export const FormRenderer: React.FC<FormRendererProps> = ({ form }) => {
     setErrors({});
   };
 
+  const handleBack = ()=> {
+    setActiveForm(null)
+    navigate('/')
+  }
+
   return (
     <div className="max-w-3xl mx-auto">
       <button
-        onClick={() => setActiveForm(null)}
+        onClick={handleBack}
         className="mb-4 flex items-center text-gray-600 hover:text-gray-900"
       >
         <ArrowLeft size={16} className="mr-1" /> Back to Forms
@@ -100,6 +108,7 @@ export const FormRenderer: React.FC<FormRendererProps> = ({ form }) => {
           <button
             type="submit"
             className="flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+            onSubmit={()=> console.log("Submiited")}
           >
             <Save size={16} className="mr-1" /> Submit
           </button>

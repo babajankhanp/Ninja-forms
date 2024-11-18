@@ -134,6 +134,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
       )}
 
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-4">
+       <label className="block text-sm font-medium text-gray-700" htmlFor="formName">
+          Form Title
+        </label>
         <input
           type="text"
           value={formName}
@@ -145,6 +148,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
 
         <div className="flex items-center space-x-4">
           <Database size={20} className="text-gray-400" />
+          <label htmlFor="persistenceType" className="block text-sm font-medium text-gray-700">
+            Data Persistence Type
+          </label>
           <select
             value={persistenceType}
             onChange={(e) => setPersistenceType(e.target.value as PersistenceType)}
@@ -160,6 +166,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
       {groups.map((group) => (
         <div key={group.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="space-y-4">
+            <label htmlFor="Group Name" className="block text-sm font-medium text-gray-700">
+           Group Name
+          </label>
             <input
               type="text"
               value={group.name}
@@ -168,6 +177,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
               className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               required
             />
+        <label htmlFor="Group Description" className="block text-sm font-medium text-gray-700">
+           Group Description
+          </label>
             <textarea
               value={group.description}
               onChange={(e) => setGroups(groups.map(g => g.id === group.id ? { ...g, description: e.target.value } : g))}

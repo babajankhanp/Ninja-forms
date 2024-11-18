@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormStore } from '../../store/formStore';
-import { FileText, Calendar, Trash2, Edit2, Link, Search, ExternalLink } from 'lucide-react';
+import { FileText, Calendar, Trash2, Edit2, Search, EyeIcon, BookCheck } from 'lucide-react';
 
 export const FormList: React.FC = () => {
   const { forms, deleteForm, publishForm, publishedForms } = useFormStore();
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+
+  console.log(forms, "forms")
 
   if (forms.length === 0) {
     return (
@@ -27,25 +29,23 @@ export const FormList: React.FC = () => {
     );
   }
 
-  const filteredForms = forms.filter(form => 
+  const filteredForms = forms.filter(form =>
     form.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handlePublish = (formId: string) => {
     const publishedId = publishForm(formId);
-    const formUrl = `${window.location.origin}/forms/${publishedId}`;
-    navigator.clipboard.writeText(formUrl);
-    alert('Form published! URL copied to clipboard.');
+    alert('Form published!');
+    console.log(publishedId, "publishedId")
   };
 
   const openPublishedForm = (publishedId: string) => {
-    window.open(`/forms/${publishedId}`, '_blank');
+     if (publishedId) {
+        navigate(`/forms/${publishedId}`);
+     }
   };
-
-  const getFormUrl = (formName: string) => {
-    return `/edit/${formName.toLowerCase().replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 6)}`;
-  };
-
+console.log(publishedForms)
+console.log(forms, "forms")
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -61,7 +61,7 @@ export const FormList: React.FC = () => {
           />
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredForms.map((form) => (
           <div
@@ -76,12 +76,12 @@ export const FormList: React.FC = () => {
               </div>
               <span className="text-sm text-gray-500">v{form.version}</span>
             </div>
-            
+
             <div className="mt-4 flex items-center text-sm text-gray-500">
               <Calendar className="h-4 w-4 mr-1" />
               {new Date(form.updatedAt).toLocaleDateString()}
             </div>
-            
+
             <div className="mt-2 text-sm text-gray-600">
               {form.groups.length} groups • {form.groups.reduce((acc, group) => acc + group.fields.length, 0)} fields
             </div>
@@ -95,7 +95,7 @@ export const FormList: React.FC = () => {
                 className="p-2 text-green-600 hover:bg-green-50 rounded-md"
                 title="Publish"
               >
-                <Link size={18} />
+                <BookCheck size={18} />
               </button>
               <button
                 onClick={(e) => {
@@ -110,14 +110,14 @@ export const FormList: React.FC = () => {
             </div>
 
             {publishedForms[form.id] && (
-              <div 
+              <div
                 className="mt-2 flex items-center text-sm text-blue-600 cursor-pointer hover:text-blue-800"
                 onClick={(e) => {
                   e.stopPropagation();
                   openPublishedForm(publishedForms[form.id]);
                 }}
               >
-                <ExternalLink size={14} className="mr-1" />
+                <EyeIcon size={14} className="mr-1" />
                 <span>Published Form</span>
               </div>
             )}
