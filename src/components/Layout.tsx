@@ -21,7 +21,7 @@ export const Layout: React.FC = () => {
               <LayoutIcon className={`h-8 w-8 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
               <h1 className={`ml-2 text-2xl font-bold ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
-              }`}>Dynamic Form Builder</h1>
+              }`}>Dynamic Form Builder <span className='text-gray-600'> (Config Driven)</span></h1>
             </Link>
             <div className="flex items-center gap-4">
               {isHome && (
