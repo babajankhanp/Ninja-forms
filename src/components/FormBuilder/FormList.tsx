@@ -44,8 +44,14 @@ export const FormList: React.FC = () => {
         navigate(`/forms/${publishedId}`);
      }
   };
+
+  const editFormDefination = (formId:string)=> {
+     navigate(`/edit/${formId}`)
+  }
+
 console.log(publishedForms)
 console.log(forms, "forms")
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -86,7 +92,7 @@ console.log(forms, "forms")
               {form.groups.length} groups • {form.groups.reduce((acc, group) => acc + group.fields.length, 0)} fields
             </div>
 
-            <div className="mt-4 flex justify-end space-x-2">
+            <div className="mt-4 flex justify-end space-x-2 align-middle gap-1">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -95,7 +101,19 @@ console.log(forms, "forms")
                 className="p-2 text-green-600 hover:bg-green-50 rounded-md"
                 title="Publish"
               >
-                <BookCheck size={18} />
+                <div className='flex justify-center align-middle gap-1 items-center text-sm'><BookCheck size={18} />
+                Publish</div>
+              </button>
+               <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  editFormDefination(form.id);
+                }}
+                className="p-2 text-sm text-blue-600 cursor-pointer hover:bg-blue-50 rounded-md"
+                title="Publish"
+              >
+                <div className='flex justify-center align-middle gap-1 items-center text-sm'><BookCheck size={18} />
+                Edit</div>
               </button>
               <button
                 onClick={(e) => {
@@ -105,7 +123,8 @@ console.log(forms, "forms")
                 className="p-2 text-red-600 hover:bg-red-50 rounded-md"
                 title="Delete"
               >
-                <Trash2 size={18} />
+                  <div className='flex justify-center align-middle gap-1  items-center text-sm'>  <Trash2 size={18} />
+                Delete</div>
               </button>
             </div>
 
@@ -118,7 +137,7 @@ console.log(forms, "forms")
                 }}
               >
                 <EyeIcon size={14} className="mr-1" />
-                <span>Published Form</span>
+                <span>View Published Form</span>
               </div>
             )}
           </div>
