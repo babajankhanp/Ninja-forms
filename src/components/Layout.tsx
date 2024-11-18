@@ -28,8 +28,8 @@ export const Layout: React.FC = () => {
                 <Link
                   to="/new"
                   className={`flex items-center px-4 py-2 rounded-lg ${
-                    isDarkMode 
-                      ? 'bg-blue-600 hover:bg-blue-700' 
+                    isDarkMode
+                      ? 'bg-blue-600 hover:bg-blue-700'
                       : 'bg-blue-500 hover:bg-blue-600'
                   } text-white transition-colors duration-200`}
                 >
@@ -40,8 +40,8 @@ export const Layout: React.FC = () => {
               <button
                 onClick={toggleTheme}
                 className={`p-2 rounded-lg ${
-                  isDarkMode 
-                    ? 'text-yellow-400 hover:bg-gray-700' 
+                  isDarkMode
+                    ? 'text-yellow-400 hover:bg-gray-700'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -55,6 +55,24 @@ export const Layout: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
+
+      {/* Footer */}
+      <footer className={`bg-gray-800 text-white text-center py-4 mt-8 ${
+        isDarkMode ? 'bg-gray-800' : 'bg-gray-50 text-gray-900'
+      }`}>
+        <p>&copy; 2024 Babajan Patan. All rights reserved.</p>
+         <div className='flex justify-around m-0 p-2'>
+           <a href="mailto:babajank98@gmail.com" className="text-blue-400 hover:text-blue-600">
+           Contact
+          </a>
+         <a href="https://github.com/babajankhanp" className="text-blue-400 hover:text-blue-600">
+            GitHub
+         </a>
+          <a href="https://www.linkedin.com/in/babajan-patan" className="text-blue-400 hover:text-blue-600">
+            LinkedIn
+          </a>
+         </div>
+      </footer>
     </div>
   );
 };
