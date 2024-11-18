@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Field, FieldGroup, FieldType, Form, HttpMethod, PersistenceType, SelectOption, SubmitButtonConfig } from '../../types/form';
-import { Plus, Save, Database, Minus } from 'lucide-react';
+import { Plus, Save, Database, Minus, Clock } from 'lucide-react';
 import { useFormStore } from '../../store/formStore';
 import { SelectOptionsEditor } from './SelectOptionsEditor';
 
@@ -16,6 +16,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
   const [formName, setFormName] = useState(initialForm?.name || '');
   const [groups, setGroups] = useState<FieldGroup[]>(initialForm?.groups || []);
   const [persistenceType, setPersistenceType] = useState<PersistenceType>(initialForm?.persistenceType || 'session');
+  const [expiryDuration, setExpiryDuration] = useState<ExpiryDuration | undefined>(initialForm?.expiryDuration);
   const [submitButton, setSubmitButton] = useState<SubmitButtonConfig>({
     text: 'Submit',
     apiEndpoint: '',
@@ -25,6 +26,16 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
   const [error, setError] = useState<string | null>(null);
 
   const fieldTypes: FieldType[] = ['text', 'number', 'richText', 'date', 'singleSelect', 'multiSelect', 'email'];
+
+  const expiryOptions = [
+    { value: '1_day', label: '1 Day' },
+    { value: '1_week', label: '1 Week' },
+    { value: '2_weeks', label: '2 Weeks' },
+    { value: '3_weeks', label: '3 Weeks' },
+    { value: '1_month', label: '1 Month' },
+    { value: '3_months', label: '3 Months' },
+    { value: '6_months', label: '6 Months' },
+  ];
 
   const validateForm = (): boolean => {
     if (!formName.trim()) {
@@ -56,6 +67,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
           name: formName,
           groups,
           persistenceType,
+          expiryDuration: persistenceType === 'permanent' ? expiryDuration : undefined,
           submitButton,
           updatedAt: new Date()
         });
@@ -65,6 +77,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
           name: formName,
           groups,
           persistenceType,
+          expiryDuration: persistenceType === 'permanent' ? expiryDuration : undefined,
           submitButton
         });
         navigate('/');
@@ -161,7 +174,12 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
           </label>
           <select
             value={persistenceType}
-            onChange={(e) => setPersistenceType(e.target.value as PersistenceType)}
+            onChange={(e) => {
+              setPersistenceType(e.target.value as PersistenceType);
+              if (e.target.value !== 'permanent') {
+                setExpiryDuration(undefined);
+              }
+            }}
             className="flex-1 px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="none">No Data Persistence</option>
@@ -169,6 +187,28 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
             <option value="permanent">Permanent Storage (Encrypted)</option>
           </select>
         </div>
+
+        {persistenceType === 'permanent' && (
+          <div className="flex items-center space-x-4 mt-4">
+            <Clock size={20} className="text-gray-400" />
+            <label htmlFor="expiryDuration" className="block text-sm font-medium text-gray-700">
+              Data Expiry Duration
+            </label>
+            <select
+              value={expiryDuration}
+              onChange={(e) => setExpiryDuration(e.target.value as ExpiryDuration)}
+              className="flex-1 px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Select Expiry Duration</option>
+              {expiryOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {groups.map((group) => (
@@ -276,7 +316,27 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
         </div>
       ))}
 
-       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="flex justify-between">
+        <div className='flex gap-1 justify-center align-middle'>
+          <button
+          type="button"
+          onClick={addGroup}
+          className="flex items-center px-4 py-2 text-sm font-medium text--700 bg-white border border-gray-300 rounded-md"
+          style={{ backgroundColor: '#22c55e', color:"#fff" }}
+        >
+          <Plus size={16} className="mr-1" /> Add Group
+        </button>
+        <button
+          type="button"
+          onClick={deleteGroup}
+           className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-white-300 rounded-md hover:bg-[#e11d48]"
+           style={{ backgroundColor: '#e11d48', color:"#fff" }}
+        >
+          <Minus size={16} className="mr-1" /> Delete Last Group
+        </button>
+        </div>
+      </div>
+             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-lg font-medium mb-4">Submit Button Configuration</h3>
 
           <div className="space-y-4">
@@ -335,33 +395,14 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
             </div>
           </div>
         </div>
-
-      <div className="flex justify-between">
-        <div className='flex gap-1 justify-center align-middle'>
-          <button
-          type="button"
-          onClick={addGroup}
-          className="flex items-center px-4 py-2 text-sm font-medium text--700 bg-white border border-gray-300 rounded-md"
-          style={{ backgroundColor: '#22c55e', color:"#fff" }}
-        >
-          <Plus size={16} className="mr-1" /> Add Group
-        </button>
-        <button
-          type="button"
-          onClick={deleteGroup}
-           className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-white-300 rounded-md hover:bg-[#e11d48]"
-           style={{ backgroundColor: '#e11d48', color:"#fff" }}
-        >
-          <Minus size={16} className="mr-1" /> Delete Last Group
-        </button>
-        </div>
-        <button
+        <div className='flex align-middle justify-end'>
+           <button
           type="submit"
           className="flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
         >
           <Save size={16} className="mr-1" /> {initialForm ? 'Update Form' : 'Save Form'}
         </button>
-      </div>
+        </div>
     </form>
   );
 };

@@ -1,101 +1,74 @@
 import { useState, useEffect } from 'react';
-import { FormData, PersistenceType } from '../types/form';
-import { encrypt, decrypt } from '../utils/encryption';
+import { useFormStore } from '../store/formStore';
+import { Form } from '../types/form';
 
-const COOKIE_EXPIRY = 365; // days
-
-const setCookie = (name: string, value: string, days: number) => {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Strict; Secure`;
-};
-
-const getCookie = (name: string): string | null => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) {
-    const cookieValue = parts.pop()?.split(';').shift();
-    return cookieValue ? decodeURIComponent(cookieValue) : null;
+const getExpiryTime = (duration: string): number => {
+  const now = new Date().getTime();
+  switch (duration) {
+    case '1_day':
+      return now + (24 * 60 * 60 * 1000);
+    case '1_week':
+      return now + (7 * 24 * 60 * 60 * 1000);
+    case '2_weeks':
+      return now + (14 * 24 * 60 * 60 * 1000);
+    case '3_weeks':
+      return now + (21 * 24 * 60 * 60 * 1000);
+    case '1_month':
+      return now + (30 * 24 * 60 * 60 * 1000);
+    case '3_months':
+      return now + (90 * 24 * 60 * 60 * 1000);
+    case '6_months':
+      return now + (180 * 24 * 60 * 60 * 1000);
+    default:
+      return now + (7 * 24 * 60 * 60 * 1000); // Default to 1 week
   }
-  return null;
 };
 
-export const useFormPersistence = (formId: string, persistenceType: PersistenceType = 'session') => {
-  const storageKey = `form_data_${formId}`;
+export const useFormPersistence = (formId: string) => {
+  const form = useFormStore(state => state.forms.find(f => f.id === formId));
+  const [formData, setFormData] = useState<Record<string, any>>({});
 
-  const loadPersistedData = async (): Promise<FormData> => {
-    try {
-      if (persistenceType === 'permanent') {
-        const cookieData = getCookie(storageKey);
-        if (cookieData) {
-          const decryptedData = await decrypt(cookieData);
-          return JSON.parse(decryptedData);
-        }
-      } else if (persistenceType === 'session') {
-        const sessionData = sessionStorage.getItem(storageKey);
-        if (sessionData) {
-          return JSON.parse(sessionData);
+  useEffect(() => {
+    if (!form) return;
+
+    if (form.persistenceType === 'permanent') {
+      const storedData = localStorage.getItem(`form_${formId}`);
+      if (storedData) {
+        const { data, expiry } = JSON.parse(storedData);
+        if (expiry && new Date().getTime() < expiry) {
+          setFormData(data);
+        } else {
+          localStorage.removeItem(`form_${formId}`);
         }
       }
-      return {};
-    } catch (error) {
-      console.error('Error loading form data:', error);
-      return {};
+    } else if (form.persistenceType === 'session') {
+      const data = sessionStorage.getItem(`form_${formId}`);
+      if (data) {
+        setFormData(JSON.parse(data));
+      }
     }
+  }, [formId, form]);
+
+  const persistData = (newData: Record<string, any>) => {
+    if (!form) return;
+
+    if (form.persistenceType === 'permanent') {
+      const expiryTime = getExpiryTime(form.expiryDuration || '1_week');
+      localStorage.setItem(`form_${formId}`, JSON.stringify({
+        data: newData,
+        expiry: expiryTime
+      }));
+    } else if (form.persistenceType === 'session') {
+      sessionStorage.setItem(`form_${formId}`, JSON.stringify(newData));
+    }
+    setFormData(newData);
   };
-
-  const [formData, setFormData] = useState<FormData>({});
-
-  console.log(formData, "formData from persist")
-
-  useEffect(() => {
-    loadPersistedData().then(setFormData);
-  }, []);
-
-  useEffect(() => {
-    if (!formData || Object.keys(formData).length === 0) return;
-
-    const saveData = async () => {
-      try {
-        if (persistenceType === 'permanent') {
-          const encryptedData = await encrypt(JSON.stringify(formData));
-          setCookie(storageKey, encryptedData, COOKIE_EXPIRY);
-        } else if (persistenceType === 'session') {
-          sessionStorage.setItem(storageKey, JSON.stringify(formData));
-        }
-      } catch (error) {
-        console.error('Error saving form data:', error);
-      }
-    };
-
-    saveData();
-  }, [formData, storageKey, persistenceType]);
 
   const clearPersistedData = () => {
-    try {
-      if (persistenceType === 'permanent') {
-        setCookie(storageKey, '', -1);
-      } else if (persistenceType === 'session') {
-        sessionStorage.removeItem(storageKey);
-      }
-      setFormData({});
-    } catch (error) {
-      console.error('Error clearing form data:', error);
-    }
+    localStorage.removeItem(`form_${formId}`);
+    sessionStorage.removeItem(`form_${formId}`);
+    setFormData({});
   };
 
-  const hasPersistedData = (): boolean => {
-    if (persistenceType === 'permanent') {
-      return !!getCookie(storageKey);
-    } else if (persistenceType === 'session') {
-      return !!sessionStorage.getItem(storageKey);
-    }
-    return false;
-  };
-
-  return {
-    formData,
-    setFormData,
-    clearPersistedData,
-    hasPersistedData,
-  };
+  return { formData, setFormData: persistData, clearPersistedData };
 };

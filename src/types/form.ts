@@ -4,6 +4,8 @@ export type PersistenceType = 'none' | 'session' | 'permanent';
 
 export type FieldType = 'text' | 'number' | 'richText' | 'date' | 'singleSelect' | 'multiSelect' | 'email';
 
+export type ExpiryDuration = '1_day' | '1_week' | '2_weeks' | '3_weeks' | '1_month' | '3_months' | '6_months';
+
 export interface ValidationRule {
   required?: boolean;
   maxLength?: number;
@@ -68,6 +70,7 @@ export interface Form {
   createdAt: Date;
   updatedAt: Date;
   persistenceType: PersistenceType;
+  expiryDuration?: ExpiryDuration;
   submitConfig: FormSubmitConfig;
   submitButton?: SubmitButtonConfig;
 }
