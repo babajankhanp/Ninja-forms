@@ -9,7 +9,7 @@ export const Layout: React.FC = () => {
   const isHome = location.pathname === '/';
 
   return (
-    <div className={`h-screen flex flex-col transition-colors duration-200 ${
+    <div className={`min-h-screen transition-colors duration-200 ${
       isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'
     }`}>
       <header className={`${
@@ -21,7 +21,7 @@ export const Layout: React.FC = () => {
               <LayoutIcon className={`h-8 w-8 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
               <h1 className={`ml-2 text-2xl font-bold ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
-              }`}>Dynamic Form Builder <span className='text-gray-600'> (Config Driven)</span></h1>
+              }`}>Dynamic Form Builder</h1>
             </Link>
             <div className="flex items-center gap-4">
               {isHome && (
@@ -52,31 +52,26 @@ export const Layout: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main
-        className={`flex-1 overflow-y-auto max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        }`}
-      >
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-3">
         <Outlet />
       </main>
 
       {/* Footer */}
-      <footer className={`bg-gray-800 text-white text-center py-4 ${
+      <footer className={`bg-gray-800 text-white text-center py-12 mt-8 ${
         isDarkMode ? 'bg-gray-800' : 'bg-gray-50 text-gray-900'
       }`}>
         <p>&copy; 2024 Babajan Patan. All rights reserved.</p>
-        <div className="flex justify-around p-2">
-          <a href="mailto:babajank98@gmail.com" className="text-blue-400 hover:text-blue-600">
-            Contact
+         <div className='flex justify-around m-0 p-2'>
+           <a href="mailto:babajank98@gmail.com" className="text-blue-400 hover:text-blue-600">
+           Contact
           </a>
-          <a href="https://github.com/babajankhanp" className="text-blue-400 hover:text-blue-600">
+         <a href="https://github.com/babajankhanp" className="text-blue-400 hover:text-blue-600">
             GitHub
-          </a>
+         </a>
           <a href="https://www.linkedin.com/in/babajan-patan" className="text-blue-400 hover:text-blue-600">
             LinkedIn
           </a>
-        </div>
+         </div>
       </footer>
     </div>
   );
