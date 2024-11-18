@@ -24,21 +24,9 @@ export const useFormStore = create<FormStore>((set) => ({
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
-      submitConfig: {
-        endpoint: '',
-        method: 'POST',
-        headers: {},
-      },
-      submitButton: {
-        text: 'Submit',
-        apiEndpoint: '',
-        httpMethod: 'POST' as HttpMethod,
-        validation: true
-      }
     };
     set((state) => ({
-      forms: [...state.forms, newForm],
-      activeForm: newForm
+      forms: [...state.forms, newForm]
     }));
   },
   updateForm: (form) => {

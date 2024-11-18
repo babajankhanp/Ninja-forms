@@ -82,7 +82,7 @@ export const FieldComponent: React.FC<FieldComponentProps> = ({
             value={value ?? ''}
             onChange={onChange}
             error={hasError}
-            format="DD/MM/YYYY"
+            format={field?.dateFormat || "DD/MM/YYYY"}
           />
         );
 

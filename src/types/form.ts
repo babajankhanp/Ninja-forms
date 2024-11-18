@@ -40,6 +40,7 @@ export interface Field {
   placeholder?: string;
   defaultValue?: any;
   persistenceType?: PersistenceType;
+  dateFormat?: string;
 }
 
 export interface FieldGroup {
@@ -63,16 +64,15 @@ export interface SubmitButtonConfig {
 }
 
 export interface Form {
-  id: string;
+  id?: string;
   name: string;
   groups: FieldGroup[];
-  version: number;
-  createdAt: Date;
-  updatedAt: Date;
   persistenceType: PersistenceType;
   expiryDuration?: ExpiryDuration;
-  submitConfig: FormSubmitConfig;
-  submitButton?: SubmitButtonConfig;
+  submitConfig: SubmitButtonConfig;
+  version?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface FormData {

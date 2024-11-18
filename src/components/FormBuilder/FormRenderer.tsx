@@ -12,10 +12,13 @@ interface FormRendererProps {
 }
 
 export const FormRenderer: React.FC<FormRendererProps> = ({ form }) => {
-  const { setActiveForm } = useFormStore();
+  const { setActiveForm , forms} = useFormStore();
   const { formData, setFormData, clearPersistedData } = useFormPersistence(form.id);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+
+   console.log(forms, "formhdjshs")
+
 
   const navigate = useNavigate();
 
@@ -50,7 +53,6 @@ export const FormRenderer: React.FC<FormRendererProps> = ({ form }) => {
       return newData;
     });
   };
-console.log(form, "form")
 
   const collectFormData = () => {
     const payload: Record<string, any> = {
@@ -61,6 +63,8 @@ console.log(form, "form")
       data: {}
     };
 
+     console.log(form.groups, "form groups")
+     console.log(formData, "my fff")
     // Collect all field values organized by groups
     form.groups.forEach(group => {
       payload.data[group.name] = {};
@@ -75,21 +79,23 @@ console.log(form, "form")
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (form.submitButton?.validation && !validateForm()) {
+    console.log(form, "my form")
+
+    if (form.submitConfig?.validation && !validateForm()) {
       alert('Please fill all required fields correctly');
       return;
     }
 
     try {
-      if (!form.submitButton?.apiEndpoint) {
+      if (!form.submitConfig?.apiEndpoint) {
         throw new Error('No API endpoint configured');
       }
 
       const payload = collectFormData();
       console.log('Submitting form data:', payload);
 
-      const response = await fetch(form.submitButton.apiEndpoint, {
-        method: form.submitButton.httpMethod,
+      const response = await fetch(form.submitConfig.apiEndpoint, {
+        method: form.submitConfig.httpMethod,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -165,7 +171,7 @@ console.log(form, "form")
             type="submit"
             className="flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
           >
-            <Save size={16} className="mr-1" /> {form.submitButton?.text || 'Submit'}
+            <Save size={16} className="mr-1" /> {form?.submitButton?.text || 'Submit'}
           </button>
         </div>
 

@@ -144,6 +144,8 @@ export const useFormPersistence = (formId: string) => {
     }
   };
 
+  console.log(form, "form from store")
+
   return {
     formData,
     setFormData: (newData: Record<string, any>) => {

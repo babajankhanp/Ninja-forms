@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Field, FieldGroup, FieldType, Form, HttpMethod, PersistenceType, SelectOption, SubmitButtonConfig } from '../../types/form';
+import { Field, FieldGroup, FieldType, Form, HttpMethod, PersistenceType, SelectOption, SubmitButtonConfig, ExpiryDuration } from '../../types/form';
 import { Plus, Save, Database, Minus, Clock } from 'lucide-react';
 import { useFormStore } from '../../store/formStore';
 import { SelectOptionsEditor } from './SelectOptionsEditor';
@@ -9,23 +9,6 @@ interface FormBuilderProps {
   initialForm?: Form;
   onSubmit?: (form: Form) => void;
 }
-
-export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit }) => {
-  const navigate = useNavigate();
-  const { addForm } = useFormStore();
-  const [formName, setFormName] = useState(initialForm?.name || '');
-  const [groups, setGroups] = useState<FieldGroup[]>(initialForm?.groups || []);
-  const [persistenceType, setPersistenceType] = useState<PersistenceType>(initialForm?.persistenceType || 'session');
-  const [expiryDuration, setExpiryDuration] = useState<ExpiryDuration | undefined>(initialForm?.expiryDuration);
-  const [submitButton, setSubmitButton] = useState<SubmitButtonConfig>({
-    text: 'Submit',
-    apiEndpoint: '',
-    httpMethod: 'POST',
-    validation: true
-  });
-  const [error, setError] = useState<string | null>(null);
-
-  const fieldTypes: FieldType[] = ['text', 'number', 'richText', 'date', 'singleSelect', 'multiSelect', 'email'];
 
   const expiryOptions = [
     { value: '1_day', label: '1 Day' },
@@ -36,6 +19,30 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
     { value: '3_months', label: '3 Months' },
     { value: '6_months', label: '6 Months' },
   ];
+
+  const dateFormatOptions = [
+      { label: 'DD/MM/YYYY', value: 'dd/MM/yyyy' },
+      { label: 'MM-DD-YYYY', value: 'MM-dd-yyyy' },
+      {label:'YYYY-MM-DD', value:'yyyy-MM-dd'}
+    ]
+
+export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit }) => {
+  const navigate = useNavigate();
+  const { addForm } = useFormStore();
+  const [formName, setFormName] = useState(initialForm?.name || '');
+  const [groups, setGroups] = useState<FieldGroup[]>(initialForm?.groups || []);
+  const [persistenceType, setPersistenceType] = useState<PersistenceType>(initialForm?.persistenceType || 'session');
+  const [expiryDuration, setExpiryDuration] = useState<ExpiryDuration | undefined>(initialForm?.expiryDuration);
+  const [submitConfig, setSubmitConfig] = useState<SubmitButtonConfig>(initialForm?.submitConfig || {
+    text: 'Submit',
+    apiEndpoint: '',
+    httpMethod: 'POST',
+    validation: true
+  } );
+  const [error, setError] = useState<string | null>(null);
+
+  const fieldTypes: FieldType[] = ['text', 'number', 'richText', 'date', 'singleSelect', 'multiSelect', 'email'];
+
 
   const validateForm = (): boolean => {
     if (!formName.trim()) {
@@ -68,7 +75,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
           groups,
           persistenceType,
           expiryDuration: persistenceType === 'permanent' ? expiryDuration : undefined,
-          submitButton,
+          submitConfig,
           updatedAt: new Date()
         });
         navigate('/');
@@ -78,7 +85,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
           groups,
           persistenceType,
           expiryDuration: persistenceType === 'permanent' ? expiryDuration : undefined,
-          submitButton
+          submitConfig
         });
         navigate('/');
       }
@@ -145,7 +152,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
       )
     );
   };
-
+console.log(submitConfig, "submitConfig")
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
@@ -268,7 +275,35 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
                     ))}
                   </select>
                 </div>
-
+                {field.type === 'date' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <select
+                            value={field.dateFormat || ''}
+                            onChange={(e) =>
+                              setGroups(
+                                groups.map((g) =>
+                                  g.id === group.id
+                                    ? {
+                                        ...g,
+                                        fields: g.fields.map((f) =>
+                                          f.id === field.id ? { ...f, dateFormat: e.target.value } : f
+                                        ),
+                                      }
+                                    : g
+                                )
+                              )
+                            }
+                            className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="">Select Date Format</option>
+                            {dateFormatOptions.map((format) => (
+                              <option key={format.value} value={format.value}>
+                                {format.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                 {['singleSelect', 'multiSelect'].includes(field.type) && (
                   <SelectOptionsEditor
                     options={field.options || []}
@@ -346,8 +381,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
               </label>
               <input
                 type="text"
-                value={submitButton.text}
-                onChange={(e) => setSubmitButton({ ...submitButton, text: e.target.value })}
+                value={submitConfig.text}
+                onChange={(e) => setSubmitConfig({ ...submitConfig, text: e.target.value })}
               className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Submit"
               />
@@ -359,11 +394,10 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
               </label>
               <input
                 type="text"
-                value={submitButton.apiEndpoint}
-                onChange={(e) => setSubmitButton({ ...submitButton, apiEndpoint: e.target.value })}
-              className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                value={submitConfig.apiEndpoint}
+                 onChange={(e) => setSubmitConfig({ ...submitConfig, apiEndpoint: e.target.value })}
+                 className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="https://api.example.com/submit"
-                required
               />
             </div>
 
@@ -372,8 +406,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
                 HTTP Method
               </label>
               <select
-                value={submitButton.httpMethod}
-                onChange={(e) => setSubmitButton({ ...submitButton, httpMethod: e.target.value as HttpMethod })}
+                value={submitConfig.httpMethod}
+                onChange={(e) => setSubmitConfig({ ...submitConfig, httpMethod: e.target.value as HttpMethod })}
               className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               >
                 {['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((method) => (
@@ -385,8 +419,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
             <div className="flex items-center">
               <input
                 type="checkbox"
-                checked={submitButton.validation}
-                onChange={(e) => setSubmitButton({ ...submitButton, validation: e.target.checked })}
+                checked={submitConfig.validation}
+                onChange={(e) => setSubmitConfig({ ...submitConfig, validation: e.target.checked })}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label className="ml-2 block text-sm text-gray-700">
