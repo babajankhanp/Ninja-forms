@@ -9,11 +9,17 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      isDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+      isDarkMode: false,
       toggleTheme: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
     }),
     {
       name: 'theme-storage',
+      onRehydrateStorage: () => (state) => {
+        if (state?.isDarkMode === undefined) {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          state!.isDarkMode = prefersDark;
+        }
+      },
     }
   )
 );

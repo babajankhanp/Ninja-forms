@@ -33,7 +33,7 @@ export const FormList: React.FC = () => {
   <h4 className="text-md font-semibold text-gray-700 mb-2">
     Instructions
   </h4>
-  <p className="max-w-lg text-sm text-white-600 mb-4">
+  <p className="max-w-lg text-sm text-gray-600 mb-4">
     A powerful and flexible form builder application that allows users to create, manage, and publish dynamic forms with custom validations and submission handling.
   </p>
   <ol className="list-decimal text-sm text-gray-600 my-2 flex flex-col items-start">
