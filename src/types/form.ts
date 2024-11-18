@@ -53,6 +53,13 @@ export interface FormSubmitConfig {
   headers: Record<string, string>;
 }
 
+export interface SubmitButtonConfig {
+  text: string;
+  apiEndpoint?: string;
+  httpMethod: HttpMethod;
+  validation?: boolean;
+}
+
 export interface Form {
   id: string;
   name: string;
@@ -62,6 +69,7 @@ export interface Form {
   updatedAt: Date;
   persistenceType: PersistenceType;
   submitConfig: FormSubmitConfig;
+  submitButton?: SubmitButtonConfig;
 }
 
 export interface FormData {

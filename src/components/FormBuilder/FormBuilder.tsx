@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Field, FieldGroup, FieldType, Form, PersistenceType, SelectOption } from '../../types/form';
+import { Field, FieldGroup, FieldType, Form, HttpMethod, PersistenceType, SelectOption, SubmitButtonConfig } from '../../types/form';
 import { Plus, Save, Database, Minus } from 'lucide-react';
 import { useFormStore } from '../../store/formStore';
 import { SelectOptionsEditor } from './SelectOptionsEditor';
@@ -16,6 +16,12 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
   const [formName, setFormName] = useState(initialForm?.name || '');
   const [groups, setGroups] = useState<FieldGroup[]>(initialForm?.groups || []);
   const [persistenceType, setPersistenceType] = useState<PersistenceType>(initialForm?.persistenceType || 'session');
+  const [submitButton, setSubmitButton] = useState<SubmitButtonConfig>({
+    text: 'Submit',
+    apiEndpoint: '',
+    httpMethod: 'POST',
+    validation: true
+  });
   const [error, setError] = useState<string | null>(null);
 
   const fieldTypes: FieldType[] = ['text', 'number', 'richText', 'date', 'singleSelect', 'multiSelect', 'email'];
@@ -50,6 +56,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
           name: formName,
           groups,
           persistenceType,
+          submitButton,
           updatedAt: new Date()
         });
         navigate('/');
@@ -57,7 +64,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
         addForm({
           name: formName,
           groups,
-          persistenceType
+          persistenceType,
+          submitButton
         });
         navigate('/');
       }
@@ -267,6 +275,66 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ initialForm, onSubmit 
         </div>
         </div>
       ))}
+
+       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-medium mb-4">Submit Button Configuration</h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Button Text
+              </label>
+              <input
+                type="text"
+                value={submitButton.text}
+                onChange={(e) => setSubmitButton({ ...submitButton, text: e.target.value })}
+              className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Submit"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                API Endpoint
+              </label>
+              <input
+                type="text"
+                value={submitButton.apiEndpoint}
+                onChange={(e) => setSubmitButton({ ...submitButton, apiEndpoint: e.target.value })}
+              className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="https://api.example.com/submit"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                HTTP Method
+              </label>
+              <select
+                value={submitButton.httpMethod}
+                onChange={(e) => setSubmitButton({ ...submitButton, httpMethod: e.target.value as HttpMethod })}
+              className="w-full px-4 py-2 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              >
+                {['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((method) => (
+                  <option key={method} value={method}>{method}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={submitButton.validation}
+                onChange={(e) => setSubmitButton({ ...submitButton, validation: e.target.checked })}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="ml-2 block text-sm text-gray-700">
+                Enable Form Validation
+              </label>
+            </div>
+          </div>
+        </div>
 
       <div className="flex justify-between">
         <div className='flex gap-1 justify-center align-middle'>

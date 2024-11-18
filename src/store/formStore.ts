@@ -29,8 +29,14 @@ export const useFormStore = create<FormStore>((set) => ({
         method: 'POST',
         headers: {},
       },
+      submitButton: {
+        text: 'Submit',
+        apiEndpoint: '',
+        httpMethod: 'POST' as HttpMethod,
+        validation: true
+      }
     };
-    set((state) => ({ 
+    set((state) => ({
       forms: [...state.forms, newForm],
       activeForm: newForm
     }));
@@ -61,7 +67,7 @@ export const useFormStore = create<FormStore>((set) => ({
   },
   updateSubmitConfig: (formId, config) => {
     set((state) => ({
-      forms: state.forms.map((f) => 
+      forms: state.forms.map((f) =>
         f.id === formId ? { ...f, submitConfig: config } : f
       ),
     }));

@@ -21,7 +21,7 @@ const getCookie = (name: string): string | null => {
 
 export const useFormPersistence = (formId: string, persistenceType: PersistenceType = 'session') => {
   const storageKey = `form_data_${formId}`;
-  
+
   const loadPersistedData = async (): Promise<FormData> => {
     try {
       if (persistenceType === 'permanent') {
@@ -44,6 +44,8 @@ export const useFormPersistence = (formId: string, persistenceType: PersistenceT
   };
 
   const [formData, setFormData] = useState<FormData>({});
+
+  console.log(formData, "formData from persist")
 
   useEffect(() => {
     loadPersistedData().then(setFormData);
